@@ -56,7 +56,8 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 ### Lungs
 ![Lung 3D](<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
 
-)<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/6d94f93a-dbd5-480a-b713-0f6aba2c76f3" />
+<img width="923" height="559" alt="Screenshot 2025-09-29 162551" src="https://github.com/user-attachments/assets/849ffdd8-6aca-4870-9ed8-ed012ef3cbe4" />
+
 
 
 ### Pancreas
