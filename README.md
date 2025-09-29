@@ -3,6 +3,18 @@ This repository is a growing collection of projects focused on the intersection 
 # 3D Organ Segmentation and Visualization
 
 This project visualizes three organs (Liver, heart, Pancreas) in 3D and performs automated segmentation using AI models in Python.
+## steps 
+1) Choosing 3 organs 
+2) Gathering 3D medical data: using available database / ensure data formats (DICOM , NIFTI )
+3) Using AI models (U-Net / nnU-Net / DeepLabV3+ )
+4) Using metrics like (Dice Score / IoU (Jaccard) / Hausdorff Dist )
+5)Using python codes for interactive plots and 3D rendering 
+6) Dash or Streamlit for web-based apps / Dash or Streamlit for web-based apps ( for allowing changing visibility, transparency, colors)
+7) Testing
+8) Writing documentation, including images and videos. 
+
+
+
 ## Evaluation metric 
 ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
