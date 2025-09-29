@@ -16,7 +16,7 @@ This project visualizes three organs (Liver, Lungs , Pancreas) in 3D and perform
 ## Dataset used
 andrewmvd/liver-tumor-segmentation
 
-
+https://radiopaedia.org/cases/covid-19-pneumonia-85
 
 
 https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
