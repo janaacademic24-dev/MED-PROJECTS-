@@ -28,13 +28,16 @@ https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
 - Organ-specific models
 - User-friendly script execution
 ## Evaluation metric 
-![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
+LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
+Lung <img width="996" height="256" alt="Screenshot 2025-09-29 181259" src="https://github.com/user-attachments/assets/0fde7213-60d8-4561-b42d-d48a0614d196" />
 
+Pancreas 
 
 
 ## Screenshots
-Pancreas ![pancreas segmentation ](https://github.com/user-attachments/assets/02488694-64bf-4e96-b14a-7cf60847f156)
+Pancreas [![pancreas segmentation](https://github.com/user-attachments/assets/f62f3a88-a20b-457b-9907-edac1e48b0da)
+
 
 liver ![liver 2](https://github.com/user-attachments/assets/f4ace21f-1a6b-47e3-b37f-d73e5054c9ed)
 
@@ -53,7 +56,8 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 
 
 ### Pancreas
-![Pancreas  3D](![pancreas image ](https://github.com/user-attachments/assets/6cff5847-4a8c-4af7-9cd5-c558ef33b145)
+![Pancreas  3D](!![pancreas 3D](https://github.com/user-attachments/assets/36ec6cc0-38b8-45e2-b652-0e15d51953f4)
+
 )
 
 ## Installation
