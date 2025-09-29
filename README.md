@@ -15,7 +15,10 @@ This project visualizes three organs (Liver, heart, Pancreas) in 3D and performs
 
 ## Dataset used
 andrewmvd/liver-tumor-segmentation
+
 https://msd-for-monai.s3-us-west-2.amazonaws.com/Task02_Heart.tar
+
+
 https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
 
 ## Features
