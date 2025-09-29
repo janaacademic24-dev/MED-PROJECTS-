@@ -12,6 +12,11 @@ This project visualizes three organs (brain, heart, kidney) in 3D and performs a
 - User-friendly script execution
 
 ## Screenshots
+![pancreas segmentation ](https://github.com/user-attachments/assets/02488694-64bf-4e96-b14a-7cf60847f156)
+![Heart segmentation ](https://github.com/user-attachments/assets/9b4f37d4-66e7-495c-b646-d2f202be6647)
+![liver 2](https://github.com/user-attachments/assets/f4ace21f-1a6b-47e3-b37f-d73e5054c9ed)
+
+
 
 ### Liver
 ![Liver  3D](![liver 1](https://github.com/user-attachments/assets/afb60cd9-bffa-4f96-a5c2-6c65b4e2bf45)
