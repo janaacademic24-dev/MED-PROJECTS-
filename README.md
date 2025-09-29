@@ -19,7 +19,8 @@ This project visualizes three organs (brain, heart, kidney) in 3D and performs a
 )
 
 ### Heart
-![Heart 3D](!![heart](https://github.com/user-attachments/assets/c4ff240b-5b96-4be6-8160-7272722d41a8)
+![Heart 3D](![heart 3D image ](https://github.com/user-attachments/assets/775e7a99-6996-443f-957f-2adb25f120de)
+)
 )
 )
 
