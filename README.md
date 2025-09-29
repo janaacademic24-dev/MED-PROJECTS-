@@ -13,10 +13,10 @@ This project visualizes three organs (Liver, heart, Pancreas) in 3D and performs
 7) Testing
 8) Writing documentation, including images and videos. 
 
-
-
-## Evaluation metric 
-![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
+## Dataset used
+andrewmvd/liver-tumor-segmentation
+https://msd-for-monai.s3-us-west-2.amazonaws.com/Task02_Heart.tar
+https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
 
 ## Features
 
@@ -24,6 +24,8 @@ This project visualizes three organs (Liver, heart, Pancreas) in 3D and performs
 - Automated segmentation using trained deep learning models
 - Organ-specific models
 - User-friendly script execution
+## Evaluation metric 
+![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
 ## Screenshots
 ![pancreas segmentation ](https://github.com/user-attachments/assets/02488694-64bf-4e96-b14a-7cf60847f156)
