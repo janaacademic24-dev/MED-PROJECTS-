@@ -1,0 +1,3 @@
+name : Attention U-Net,family: Attention-based
+  name: U-Net, family: CNN-based
+name: 'Swin Transformer', family': 'Transformer-based'.
