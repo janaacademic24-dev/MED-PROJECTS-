@@ -31,14 +31,7 @@ https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
 ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
 
-| Case   | File              |   DICE |    IOU |   Hausdorff (mm) |   Hausdorff_95 (mm) |
-+========+===================+========+========+==================+=====================+
-| Case_1 | sample_lung_1.nii | 0.9245 | 0.8601 |            12.34 |                8.52 |
-+--------+-------------------+--------+--------+------------------+---------------------+
-| Case_2 | sample_lung_2.nii | 0.9156 | 0.8445 |            14.67 |                9.81 |
-+--------+-------------------+--------+--------+------------------+---------------------+
-| Case_3 | sample_lung_3.nii | 0.9389 | 0.8853 |            10.23 |                7.15 |
-+--------+-------------------+--------+--------+------------------+---------------------+
+
 
 ## Screenshots
 Pancreas ![pancreas segmentation ](https://github.com/user-attachments/assets/02488694-64bf-4e96-b14a-7cf60847f156)
@@ -57,7 +50,6 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 ![Lung 3D](<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
 
 <img width="923" height="559" alt="Screenshot 2025-09-29 162551" src="https://github.com/user-attachments/assets/849ffdd8-6aca-4870-9ed8-ed012ef3cbe4" />
-
 
 
 ### Pancreas
