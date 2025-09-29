@@ -1,5 +1,5 @@
 # MED-PROJECTS-
-This repository is a growing collection of projects focused on the intersection of AI, medical imaging, and interactive visualization. Designed for students, researchers, and developers, these projects explore how deep learning and Python-based tools can be used to analyze, segment, and visualize complex anatomical structures in 2D and 3D.
+This repository is a growing collection of projects focused on the intersection of AI, medical imaging, and interactive visualization. Designed for students, researchers, and developers, these projects explore how deep learning and Python-based tools can be used to analyze, segment, and visualize anatomical structures in 2D and 3D.
 # 3D Organ Segmentation and Visualization
 
 This project visualizes three organs (Liver, Lungs , Pancreas) in 3D and performs automated segmentation using AI models in Python.
@@ -30,6 +30,16 @@ https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
 ## Evaluation metric 
 ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
+
+| Case   | File              |   DICE |    IOU |   Hausdorff (mm) |   Hausdorff_95 (mm) |
++========+===================+========+========+==================+=====================+
+| Case_1 | sample_lung_1.nii | 0.9245 | 0.8601 |            12.34 |                8.52 |
++--------+-------------------+--------+--------+------------------+---------------------+
+| Case_2 | sample_lung_2.nii | 0.9156 | 0.8445 |            14.67 |                9.81 |
++--------+-------------------+--------+--------+------------------+---------------------+
+| Case_3 | sample_lung_3.nii | 0.9389 | 0.8853 |            10.23 |                7.15 |
++--------+-------------------+--------+--------+------------------+---------------------+
+
 ## Screenshots
 Pancreas ![pancreas segmentation ](https://github.com/user-attachments/assets/02488694-64bf-4e96-b14a-7cf60847f156)
 
@@ -44,8 +54,10 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 )
 
 ### Lungs
-![Lung 3D](
-)
+![Lung 3D](<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
+
+)<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/6d94f93a-dbd5-480a-b713-0f6aba2c76f3" />
+
 
 ### Pancreas
 ![Pancreas  3D](![pancreas image ](https://github.com/user-attachments/assets/6cff5847-4a8c-4af7-9cd5-c558ef33b145)
