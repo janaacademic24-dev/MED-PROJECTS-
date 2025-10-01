@@ -19,8 +19,6 @@ andrewmvd/liver-tumor-segmentation
 https://radiopaedia.org/cases/covid-19-pneumonia-85
 
 
-https://msd-for-monai.s3-us-west-2.amazonaws.com/Task07_Pancreas.tar
-
 ## Features
 
 - 3D visualization using matplotlib/pyvista/plotly/skimage/Nibabel/scipy/Numpy
@@ -32,7 +30,7 @@ LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738
 
 Lung <img width="996" height="256" alt="Screenshot 2025-09-29 181259" src="https://github.com/user-attachments/assets/0fde7213-60d8-4561-b42d-d48a0614d196" />
 
-Pancreas 
+
 
 
 ## Screenshots
