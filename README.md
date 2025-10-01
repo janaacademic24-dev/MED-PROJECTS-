@@ -50,7 +50,7 @@ Brain <img width="1891" height="648" alt="image" src="https://github.com/user-at
 
 
 ### Lungs
-(<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
+<img width="736" height="652" alt="image" src="https://github.com/user-attachments/assets/4f5a3299-792c-447c-b4ce-c6bc3a4a791c" />
 
 ### brain
 <img width="1007" height="704" alt="capture_251001_113511" src="https://github.com/user-attachments/assets/708a9377-38c8-415c-9d65-4cd7c55d2a74" />
