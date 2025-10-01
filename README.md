@@ -2,7 +2,7 @@
 This repository is a growing collection of projects focused on the intersection of AI, medical imaging, and interactive visualization. Designed for students, researchers, and developers, these projects explore how deep learning and Python-based tools can be used to analyze, segment, and visualize anatomical structures in 2D and 3D.
 # 3D Organ Segmentation and Visualization
 
-This project visualizes three organs (Liver, Lungs , Pancreas) in 3D and performs automated segmentation using AI models in Python and Interactive controls that allow the viewer to change the colors,opacity and visbility
+This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs automated segmentation using AI models in Python and Interactive controls that allow the viewer to change the colors,opacity and visbility
 ## steps 
 1) Choosing 3 organs 
 2) Gathering 3D medical data: using available database / ensure data formats (DICOM , NIFTI )
