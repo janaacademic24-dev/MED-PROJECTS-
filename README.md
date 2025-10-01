@@ -48,17 +48,15 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 brain <img width="1883" height="824" alt="capture_251001_113946" src="https://github.com/user-attachments/assets/c5c1eb9e-e654-454c-8260-af0c96fbefcf" />
 
 
-
+##3D
 
 ### Liver
-(![liver 1](https://github.com/user-attachments/assets/afb60cd9-bffa-4f96-a5c2-6c65b4e2bf45)
-)
-)
+<img width="605" height="546" alt="image" src="https://github.com/user-attachments/assets/72c9ded2-8686-4096-bde6-0e13b8640c28" />
+
 
 ### Lungs
 (<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
-
-<img width="923" height="559" alt="Screenshot 2025-09-29 162551" src="https://github.com/user-attachments/assets/849ffdd8-6aca-4870-9ed8-ed012ef3cbe4" />)
+##Liver
 
 ### brain
 <img width="1007" height="704" alt="capture_251001_113511" src="https://github.com/user-attachments/assets/708a9377-38c8-415c-9d65-4cd7c55d2a74" />
