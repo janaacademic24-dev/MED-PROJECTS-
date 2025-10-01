@@ -31,7 +31,7 @@ LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738
 Lung <img width="1702" height="747" alt="capture_251001_112050" src="https://github.com/user-attachments/assets/6f69e739-e66f-440e-aed9-ad350040567e" />
 
 brain 
-<img width="1883" height="824" alt="capture_251001_113946" src="https://github.com/user-attachments/assets/b1b22850-3d78-48af-af40-6e907dc98d29" />
+
 <img width="1888" height="1007" alt="capture_251001_114255" src="https://github.com/user-attachments/assets/9d09f725-464a-4177-9fc2-3f0b8e6488bf" />
 
 
