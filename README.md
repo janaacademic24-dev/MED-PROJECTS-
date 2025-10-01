@@ -9,7 +9,7 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 3) Using AI models 
 4) Using metrics like (Dice Score / IoU (Jaccard) / Hausdorff Dist )
 5) Using python codes for interactive plots and 3D rendering 
-6) Dash or Streamlit for web-based apps / Dash or Streamlit for web-based apps ( for allowing changing visibility, transparency, colors)
+6) Dash or Streamlit for web-based apps ( for allowing changing visibility, transparency, colors)
 7) Testing
 8) Writing documentation, including images and videos. 
 
