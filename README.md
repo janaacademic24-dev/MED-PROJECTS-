@@ -16,6 +16,8 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 ## Dataset used
 path = kagglehub.dataset_download("andrewmvd/liver-tumor-segmentation")
 
+print("Path to dataset files:", path)
+
 
 https://radiopaedia.org/cases/covid-19-pneumonia-85
 
