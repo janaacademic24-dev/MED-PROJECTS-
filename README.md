@@ -28,7 +28,7 @@ https://radiopaedia.org/cases/covid-19-pneumonia-85
 ## Evaluation metric 
 LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
-Lung <img width="996" height="256" alt="Screenshot 2025-09-29 181259" src="https://github.com/user-attachments/assets/0fde7213-60d8-4561-b42d-d48a0614d196" />
+Lung <img width="1702" height="747" alt="capture_251001_112050" src="https://github.com/user-attachments/assets/6f69e739-e66f-440e-aed9-ad350040567e" />
 
 
 
