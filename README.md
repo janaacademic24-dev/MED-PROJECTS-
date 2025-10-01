@@ -3,6 +3,7 @@ This repository is a growing collection of projects focused on the intersection 
 # 3D Organ Segmentation and Visualization
 
 This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs automated segmentation using AI models in Python and Interactive controls that allow the viewer to change the colors,opacity and visbility
+
 ## steps 
 1) Choosing 3 organs 
 2) Gathering 3D medical data: using available database / ensure data formats (DICOM , NIFTI )
@@ -13,14 +14,6 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 7) Testing
 8) Writing documentation, including images and videos. 
 
-## Dataset used
-path = kagglehub.dataset_download("andrewmvd/liver-tumor-segmentation")
-
-print("Path to dataset files:", path)
-
-
-https://radiopaedia.org/cases/covid-19-pneumonia-85
-
 
 ## Features
 
@@ -28,6 +21,7 @@ https://radiopaedia.org/cases/covid-19-pneumonia-85
 - Automated segmentation using trained deep learning models
 - Organ-specific models
 - User-friendly script execution
+- 
 ## Evaluation metric 
 LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
@@ -48,7 +42,7 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 brain <img width="1883" height="824" alt="capture_251001_113946" src="https://github.com/user-attachments/assets/c5c1eb9e-e654-454c-8260-af0c96fbefcf" />
 
 
-##3D
+## 3D Visualization 
 
 ### Liver
 <img width="605" height="546" alt="image" src="https://github.com/user-attachments/assets/72c9ded2-8686-4096-bde6-0e13b8640c28" />
@@ -56,7 +50,6 @@ brain <img width="1883" height="824" alt="capture_251001_113946" src="https://gi
 
 ### Lungs
 (<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
-##Liver
 
 ### brain
 <img width="1007" height="704" alt="capture_251001_113511" src="https://github.com/user-attachments/assets/708a9377-38c8-415c-9d65-4cd7c55d2a74" />
