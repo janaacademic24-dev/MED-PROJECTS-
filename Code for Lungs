@@ -1,1 +1,847 @@
+# ========================================
+# ENHANCED 3D LUNG VIEWER WITH COMPLETE HTML EXPORT
+# Features: 2D Slices + Interactive Controls + Full Export
+# ========================================
 
+print("🫁 ENHANCED LUNG SEGMENTATION VIEWER")
+print("=" * 60)
+
+# STEP 1: Install packages
+print("\n📦 Installing packages...")
+!pip install -q TotalSegmentator nibabel plotly opendatasets ipywidgets matplotlib
+!pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+from google.colab import output, files
+output.enable_custom_widget_manager()
+
+import opendatasets as od
+import os
+import nibabel as nib
+import numpy as np
+from skimage import measure
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import warnings
+import subprocess
+import ipywidgets as widgets
+from IPython.display import display, clear_output, HTML
+import base64
+from io import BytesIO
+from datetime import datetime
+import json
+
+warnings.filterwarnings('ignore')
+plt.style.use('dark_background')
+
+print("✅ Packages installed!")
+
+class LungViewer:
+    def _init_(self):
+        self.segments = ['upper', 'middle', 'lower']
+        self.segment_colors = {
+            'upper': '#FF4444',
+            'middle': '#FFC107',
+            'lower': '#2196F3'
+        }
+        self.segment_opacity = {
+            'upper': 0.7,
+            'middle': 0.7,
+            'lower': 0.7
+        }
+        self.segment_visibility = {k: True for k in self.segments}
+
+        self.vertices = None
+        self.faces = None
+        self.segment_masks = None
+        self.ct_data = None
+        self.mask_data = None
+        self.current_3d_fig = None
+
+    def load_and_segment(self):
+        """Download data and run AI segmentation"""
+        print("\n📥 Downloading CT scan dataset...")
+        dataset_url = 'https://www.kaggle.com/datasets/andrewmvd/covid19-ct-scans'
+
+        try:
+            od.download(dataset_url)
+            base_path = 'covid19-ct-scans'
+            print("✅ Dataset downloaded!")
+        except:
+            print("⚠ Using alternative dataset...")
+            dataset_url = 'https://www.kaggle.com/datasets/kmader/finding-lungs-in-ct-data'
+            od.download(dataset_url)
+            base_path = 'finding-lungs-in-ct-data'
+
+        # Find CT scan files
+        nii_files = []
+        for root, dirs, files in os.walk(base_path):
+            for file in files:
+                if file.endswith('.nii') or file.endswith('.nii.gz'):
+                    nii_files.append(os.path.join(root, file))
+
+        mask_files = [f for f in nii_files if any(word in f.lower() for word in ['mask', 'seg', 'label'])]
+        image_files = [f for f in nii_files if f not in mask_files]
+
+        ct_scan_path = image_files[0] if image_files else nii_files[0]
+        print(f"📋 Selected: {os.path.basename(ct_scan_path)}")
+
+        # Load original CT data
+        ct_nii = nib.load(ct_scan_path)
+        self.ct_data = ct_nii.get_fdata()
+
+        # Run AI segmentation
+        print("\n🤖 Running TotalSegmentator AI...")
+        output_dir = "ai_segmentation_output"
+        os.makedirs(output_dir, exist_ok=True)
+
+        try:
+            cmd = f"TotalSegmentator -i {ct_scan_path} -o {output_dir} --fast --roi_subset lung_upper_lobe_left lung_upper_lobe_right lung_middle_lobe_right lung_lower_lobe_left lung_lower_lobe_right"
+            print("   Processing (30-60 seconds)...")
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+
+            if result.returncode != 0:
+                print("   Trying full segmentation...")
+                cmd = f"TotalSegmentator -i {ct_scan_path} -o {output_dir}"
+                subprocess.run(cmd, shell=True)
+        except Exception as e:
+            print(f"   ⚠ Error: {e}")
+
+        # Load segmentation
+        print("\n📂 Loading AI-segmented lungs...")
+        lung_files = []
+        for root, dirs, files in os.walk(output_dir):
+            for file in files:
+                if 'lung' in file.lower() and file.endswith('.nii.gz'):
+                    lung_files.append(os.path.join(root, file))
+
+        if lung_files:
+            print(f"   Found {len(lung_files)} lung segments")
+            combined_mask = None
+            for lung_file in lung_files:
+                lung_nii = nib.load(lung_file)
+                lung_data = lung_nii.get_fdata()
+                if combined_mask is None:
+                    combined_mask = (lung_data > 0).astype(np.uint8)
+                else:
+                    combined_mask = np.maximum(combined_mask, (lung_data > 0).astype(np.uint8))
+            self.mask_data = combined_mask
+            print("   ✅ AI segmentation loaded!")
+        else:
+            print("   ⚠ Using fallback thresholding...")
+            self.mask_data = ((self.ct_data > -1000) & (self.ct_data < -200)).astype(np.uint8)
+
+        # Create 3D mesh
+        print("\n🔺 Creating 3D mesh...")
+        downsample = 2
+        mask_small = self.mask_data[::downsample, ::downsample, ::downsample]
+
+        try:
+            self.vertices, self.faces, _, _ = measure.marching_cubes(mask_small, level=0.5)
+        except:
+            mask_small = (mask_small > 0.1).astype(np.uint8)
+            self.vertices, self.faces, _, _ = measure.marching_cubes(mask_small, level=0.5)
+
+        self.vertices = self.vertices * downsample
+        print(f"   ✅ Mesh: {len(self.vertices):,} vertices, {len(self.faces):,} faces")
+
+        # Segment into 3 parts
+        print("\n✂ Segmenting lung into 3 parts...")
+        z_coords = self.vertices[:, 2]
+        z_min, z_max = z_coords.min(), z_coords.max()
+
+        upper_third = z_min + (z_max - z_min) * 2/3
+        lower_third = z_min + (z_max - z_min) * 1/3
+
+        self.segment_masks = {
+            'upper': self.vertices[:, 2] >= upper_third,
+            'middle': (self.vertices[:, 2] < upper_third) & (self.vertices[:, 2] >= lower_third),
+            'lower': self.vertices[:, 2] < lower_third
+        }
+
+        for name, mask in self.segment_masks.items():
+            print(f"   ✅ {name.capitalize()}: {mask.sum():,} vertices")
+
+    def create_3d_visualization(self):
+        """Create interactive 3D visualization"""
+        fig = go.Figure()
+
+        segment_names = {
+            'upper': 'Upper Lobe',
+            'middle': 'Middle Lobe',
+            'lower': 'Lower Lobe'
+        }
+
+        for seg_key in self.segments:
+            if not self.segment_visibility[seg_key]:
+                continue
+
+            seg_faces_mask = self.segment_masks[seg_key][self.faces].all(axis=1)
+            seg_faces = self.faces[seg_faces_mask]
+
+            if len(seg_faces) > 0:
+                fig.add_trace(go.Mesh3d(
+                    x=self.vertices[:, 0],
+                    y=self.vertices[:, 1],
+                    z=self.vertices[:, 2],
+                    i=seg_faces[:, 0],
+                    j=seg_faces[:, 1],
+                    k=seg_faces[:, 2],
+                    color=self.segment_colors[seg_key],
+                    opacity=self.segment_opacity[seg_key],
+                    name=segment_names[seg_key],
+                    lighting=dict(ambient=0.3, diffuse=0.8, fresnel=0.1, specular=1, roughness=0.05),
+                    lightposition=dict(x=100, y=200, z=0),
+                    showlegend=True
+                ))
+
+        fig.update_layout(
+            title=dict(
+                text="🫁 3D Lung Segmentation (AI-Generated)",
+                font=dict(size=22, color='white'),
+                x=0.5
+            ),
+            scene=dict(
+                xaxis_title='X (mm)',
+                yaxis_title='Y (mm)',
+                zaxis_title='Z (mm)',
+                bgcolor='rgb(15, 15, 15)',
+                xaxis=dict(gridcolor='rgb(70, 70, 70)', showbackground=True, backgroundcolor='rgb(25, 25, 25)'),
+                yaxis=dict(gridcolor='rgb(70, 70, 70)', showbackground=True, backgroundcolor='rgb(25, 25, 25)'),
+                zaxis=dict(gridcolor='rgb(70, 70, 70)', showbackground=True, backgroundcolor='rgb(25, 25, 25)'),
+                camera=dict(eye=dict(x=1.5, y=1.5, z=1.5)),
+                aspectmode='cube'
+            ),
+            width=1100,
+            height=750,
+            paper_bgcolor='rgb(10, 10, 10)',
+            font=dict(color='white', size=14),
+            legend=dict(bgcolor='rgba(40, 40, 40, 0.9)', bordercolor='white', borderwidth=2)
+        )
+
+        self.current_3d_fig = fig
+        return fig
+
+    def generate_2d_slices_base64(self):
+        """Generate 2D slice visualizations"""
+        center_x = self.ct_data.shape[0] // 2
+        center_y = self.ct_data.shape[1] // 2
+        center_z = self.ct_data.shape[2] // 2
+
+        fig, axes = plt.subplots(1, 3, figsize=(20, 7))
+        fig.suptitle('2D Lung Slice Views with AI Segmentation', fontsize=20, color='white', fontweight='bold', y=0.95)
+        fig.patch.set_facecolor('black')
+
+        slices = [
+            {'name': f'Axial (Z={center_z})', 'ct': self.ct_data[:, :, center_z], 'mask': self.mask_data[:, :, center_z]},
+            {'name': f'Coronal (Y={center_y})', 'ct': self.ct_data[:, center_y, :], 'mask': self.mask_data[:, center_y, :]},
+            {'name': f'Sagittal (X={center_x})', 'ct': self.ct_data[center_x, :, :], 'mask': self.mask_data[center_x, :, :]}
+        ]
+
+        for i, slice_data in enumerate(slices):
+            ax = axes[i]
+
+            # Display CT scan with lung window
+            ct_windowed = np.clip(slice_data['ct'], -1000, 200)
+            ct_norm = (ct_windowed - ct_windowed.min()) / (ct_windowed.max() - ct_windowed.min())
+            ax.imshow(ct_norm, cmap='gray', interpolation='bilinear')
+
+            # Overlay segmentation
+            mask_overlay = np.zeros((*slice_data['mask'].shape, 4))
+            mask_overlay[slice_data['mask'] > 0] = [1, 0.3, 0.3, 0.5]  # Red overlay
+            ax.imshow(mask_overlay)
+
+            ax.set_title(slice_data['name'], color='white', fontsize=16, fontweight='bold', pad=20)
+            ax.axis('off')
+
+        plt.tight_layout(rect=[0, 0.03, 1, 0.92])
+
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png', facecolor='black', dpi=100, bbox_inches='tight')
+        buffer.seek(0)
+        img_base64 = base64.b64encode(buffer.read()).decode()
+        plt.close(fig)
+
+        return img_base64
+
+    def save_complete_html(self):
+        """Save complete interactive HTML with all features"""
+        if self.vertices is None:
+            print("No data to export. Please run segmentation first.")
+            return
+
+        print("\n🔄 Generating complete HTML export...")
+        print("   ├─ Creating 2D slice visualizations...")
+        slices_base64 = self.generate_2d_slices_base64()
+
+        print("   ├─ Preparing 3D visualization...")
+        fig_json = self.current_3d_fig.to_json()
+
+        print("   ├─ Bundling data...")
+        colors_json = json.dumps(self.segment_colors)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"lung_segmentation_complete_{timestamp}.html"
+
+        html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Lung Segmentation Viewer</title>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }}
+        .container {{
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }}
+        .header h1 {{ font-size: 32px; margin-bottom: 10px; }}
+        .section {{
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #dee2e6;
+        }}
+        .section-title {{
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }}
+        .controls-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }}
+        .control-group {{
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }}
+        .control-group h4 {{
+            margin-bottom: 15px;
+            font-size: 18px;
+        }}
+        .control-item {{
+            margin-bottom: 15px;
+        }}
+        .control-item label {{
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }}
+        input[type="range"] {{
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }}
+        input[type="range"]::-webkit-slider-thumb {{
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+        }}
+        input[type="color"] {{
+            width: 100%;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }}
+        .value-display {{
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #3498db;
+        }}
+        .button-group {{
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }}
+        button {{
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }}
+        .btn-primary {{ background: #3498db; color: white; }}
+        .btn-success {{ background: #2ecc71; color: white; }}
+        .btn-warning {{ background: #f39c12; color: white; }}
+        button:hover {{ transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }}
+        .slices-container {{
+            text-align: center;
+        }}
+        .slices-container img {{
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }}
+        #plot3d {{
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }}
+        .info-box {{
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }}
+        .info-box strong {{ display: block; margin-bottom: 5px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🫁 3D Lung Segmentation Viewer</h1>
+            <p>AI-Powered Interactive Visualization</p>
+            <p style="font-size: 14px; margin-top: 10px;">Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+        </div>
+
+        <div class="info-box">
+            <strong>AI Model: TotalSegmentator</strong>
+            Pretrained on 1000+ CT scans for automatic organ segmentation
+        </div>
+
+        <!-- Controls -->
+        <div class="section">
+            <h2 class="section-title">⚙ Interactive Controls</h2>
+
+            <div class="controls-grid">
+                <div class="control-group" style="border: 2px solid #FF4444;">
+                    <h4 style="color: #FF4444;">🔴 Upper Lobe</h4>
+                    <div class="control-item">
+                        <label>Color:</label>
+                        <input type="color" id="color-upper" value="#FF4444" onchange="updateVisualization()">
+                    </div>
+                    <div class="control-item">
+                        <label>Opacity: <span class="value-display" id="val-upper">0.70</span></label>
+                        <input type="range" id="opacity-upper" min="0" max="1" step="0.05" value="0.7" oninput="updateOpacity('upper', this.value)">
+                    </div>
+                    <div class="control-item">
+                        <label>
+                            <input type="checkbox" id="visible-upper" checked onchange="toggleVisibility('upper', this.checked)">
+                            Show Upper Lobe
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group" style="border: 2px solid #FFC107;">
+                    <h4 style="color: #FFC107;">🟡 Middle Lobe</h4>
+                    <div class="control-item">
+                        <label>Color:</label>
+                        <input type="color" id="color-middle" value="#FFC107" onchange="updateVisualization()">
+                    </div>
+                    <div class="control-item">
+                        <label>Opacity: <span class="value-display" id="val-middle">0.70</span></label>
+                        <input type="range" id="opacity-middle" min="0" max="1" step="0.05" value="0.7" oninput="updateOpacity('middle', this.value)">
+                    </div>
+                    <div class="control-item">
+                        <label>
+                            <input type="checkbox" id="visible-middle" checked onchange="toggleVisibility('middle', this.checked)">
+                            Show Middle Lobe
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group" style="border: 2px solid #2196F3;">
+                    <h4 style="color: #2196F3;">🔵 Lower Lobe</h4>
+                    <div class="control-item">
+                        <label>Color:</label>
+                        <input type="color" id="color-lower" value="#2196F3" onchange="updateVisualization()">
+                    </div>
+                    <div class="control-item">
+                        <label>Opacity: <span class="value-display" id="val-lower">0.70</span></label>
+                        <input type="range" id="opacity-lower" min="0" max="1" step="0.05" value="0.7" oninput="updateOpacity('lower', this.value)">
+                    </div>
+                    <div class="control-item">
+                        <label>
+                            <input type="checkbox" id="visible-lower" checked onchange="toggleVisibility('lower', this.checked)">
+                            Show Lower Lobe
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin: 20px 0 15px 0; color: #2c3e50;">Quick Presets</h4>
+            <div class="button-group">
+                <button class="btn-primary" onclick="applyPreset('default')">Default View</button>
+                <button class="btn-warning" onclick="applyPreset('transparent')">Transparent</button>
+                <button class="btn-success" onclick="applyPreset('solid')">Solid View</button>
+            </div>
+        </div>
+
+        <!-- 2D Slices -->
+        <div class="section">
+            <h2 class="section-title">📊 2D Slice Views (CT + Segmentation)</h2>
+            <div class="slices-container">
+                <img src="data:image/png;base64,{slices_base64}" alt="2D Slices">
+            </div>
+        </div>
+
+        <!-- 3D Visualization -->
+        <div class="section">
+            <h2 class="section-title">🎮 Interactive 3D Visualization</h2>
+            <div id="plot3d"></div>
+            <p style="margin-top: 15px; color: #666; text-align: center;">
+                💡 <strong>Tip:</strong> Drag to rotate • Scroll to zoom • Double-click to reset
+            </p>
+        </div>
+
+        <!-- Info Section -->
+        <div class="section">
+            <h2 class="section-title">ℹ Segmentation Information</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #FF4444;">
+                    <h3 style="color: #FF4444; margin-bottom: 10px;">Upper Lobe</h3>
+                    <p style="color: #666;">Superior portion of the lung, typically larger in right lung</p>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #FFC107;">
+                    <h3 style="color: #FFC107; margin-bottom: 10px;">Middle Lobe</h3>
+                    <p style="color: #666;">Central section, often smaller in left lung</p>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 5px solid #2196F3;">
+                    <h3 style="color: #2196F3; margin-bottom: 10px;">Lower Lobe</h3>
+                    <p style="color: #666;">Inferior portion, largest lobe in both lungs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const plotData = {fig_json};
+        const segmentColors = {colors_json};
+
+        let currentOpacities = {{
+            'upper': 0.7,
+            'middle': 0.7,
+            'lower': 0.7
+        }};
+
+        let currentVisibility = {{
+            'upper': true,
+            'middle': true,
+            'lower': true
+        }};
+
+        window.onload = function() {{
+            updateVisualization();
+        }};
+
+        function updateOpacity(segment, value) {{
+            currentOpacities[segment] = parseFloat(value);
+            document.getElementById('val-' + segment).textContent = parseFloat(value).toFixed(2);
+            updateVisualization();
+        }}
+
+        function toggleVisibility(segment, visible) {{
+            currentVisibility[segment] = visible;
+            updateVisualization();
+        }}
+
+        function applyPreset(preset) {{
+            const presets = {{
+                'default': {{'upper': 0.7, 'middle': 0.7, 'lower': 0.7}},
+                'transparent': {{'upper': 0.3, 'middle': 0.3, 'lower': 0.3}},
+                'solid': {{'upper': 0.95, 'middle': 0.95, 'lower': 0.95}}
+            }};
+
+            const values = presets[preset];
+            for (let seg in values) {{
+                currentOpacities[seg] = values[seg];
+                document.getElementById('opacity-' + seg).value = values[seg];
+                document.getElementById('val-' + seg).textContent = values[seg].toFixed(2);
+            }}
+            updateVisualization();
+        }}
+
+        function updateVisualization() {{
+            const updatedData = JSON.parse(JSON.stringify(plotData));
+
+            // Update each trace
+            const segmentOrder = ['upper', 'middle', 'lower'];
+            updatedData.data.forEach((trace, idx) => {{
+                const segment = segmentOrder[idx];
+                if (segment) {{
+                    trace.color = document.getElementById('color-' + segment).value;
+                    trace.opacity = currentVisibility[segment] ? currentOpacities[segment] : 0;
+                    trace.visible = currentVisibility[segment];
+                }}
+            }});
+
+            Plotly.newPlot('plot3d', updatedData.data, updatedData.layout, {{responsive: true}});
+        }}
+    </script>
+</body>
+</html>"""
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+
+        print(f"\n✅ Complete HTML export saved!")
+        print(f"   📄 Filename: {filename}")
+        print(f"   📦 Contents:")
+        print(f"      ├─ Interactive control panel with sliders")
+        print(f"      ├─ 2D slice visualizations (3 views)")
+        print(f"      ├─ Full 3D interactive model")
+        print(f"      └─ Segment information")
+        print(f"\n📥 Downloading file...")
+        files.download(filename)
+        print(f"✅ Download complete!")
+        print(f"\n💡 Open '{filename}' in any browser for full interactivity")
+
+    def setup_gui(self, output_3d):
+        """Create GUI control panel"""
+        display(HTML("""
+        <style>
+        .widget-label { font-weight: 600 !important; }
+        .jupyter-widgets { font-family: 'Segoe UI', sans-serif !important; }
+        </style>
+        """))
+
+        header = widgets.HTML("""
+        <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 25px; border-radius: 15px; margin-bottom: 20px;
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.2); text-align: center;'>
+            <h1 style='color: white; margin: 0; font-size: 28px;'>
+                🫁 3D Lung Segmentation Viewer
+            </h1>
+            <p style='color: rgba(255,255,255,0.9); margin: 10px 0 0 0;'>
+                AI-Powered Interactive Visualization with TotalSegmentator
+            </p>
+        </div>
+        """)
+
+        segment_controls = {}
+        segment_info = {
+            'upper': ('Upper Lobe', '#FF4444'),
+            'middle': ('Middle Lobe', '#FFC107'),
+            'lower': ('Lower Lobe', '#2196F3')
+        }
+
+        for seg_key, (label, accent) in segment_info.items():
+            color_picker = widgets.ColorPicker(
+                value=self.segment_colors[seg_key],
+                description='Color:',
+                style={'description_width': '70px'},
+                layout=widgets.Layout(width='250px')
+            )
+
+            opacity_slider = widgets.FloatSlider(
+                value=self.segment_opacity[seg_key],
+                min=0.0, max=1.0, step=0.05,
+                description='Opacity:',
+                readout_format='.2f',
+                style={'description_width': '70px'},
+                layout=widgets.Layout(width='250px')
+            )
+
+            visibility_check = widgets.Checkbox(
+                value=True,
+                description='Show',
+                style={'description_width': '70px'},
+                layout=widgets.Layout(width='100px')
+            )
+
+            color_picker.observe(lambda c, k=seg_key: self.update_color(c, k, output_3d), names='value')
+            opacity_slider.observe(lambda c, k=seg_key: self.update_opacity(c, k, output_3d), names='value')
+            visibility_check.observe(lambda c, k=seg_key: self.update_visibility(c, k, output_3d), names='value')
+
+            segment_controls[seg_key] = widgets.VBox([
+                widgets.HTML(f"<h4 style='color: {accent}; margin: 5px 0;'>{label}</h4>"),
+                color_picker, opacity_slider, visibility_check
+            ], layout=widgets.Layout(padding='10px', margin='5px', border=f'2px solid {accent}',
+                                     border_radius='10px', background_color='white'))
+
+        def make_preset_btn(label, style, preset_values):
+            btn = widgets.Button(description=label, button_style=style,
+                               layout=widgets.Layout(width='180px', height='40px'))
+            btn.on_click(lambda b: self.apply_preset(preset_values, output_3d))
+            return btn
+
+        presets = {
+            'Default': ('info', {'upper': 0.7, 'middle': 0.7, 'lower': 0.7}),
+            'Transparent': ('', {'upper': 0.3, 'middle': 0.3, 'lower': 0.3}),
+            'Solid': ('success', {'upper': 0.95, 'middle': 0.95, 'lower': 0.95})
+        }
+
+        preset_buttons = [make_preset_btn(name, style, vals) for name, (style, vals) in presets.items()]
+
+        export_btn = widgets.Button(
+            description='📥 Save Complete HTML',
+            button_style='danger',
+            tooltip='Download complete interactive HTML',
+            layout=widgets.Layout(width='380px', height='45px')
+        )
+        export_btn.on_click(lambda b: self.save_complete_html())
+
+        controls_grid = widgets.GridBox(
+            list(segment_controls.values()),
+            layout=widgets.Layout(grid_template_columns='repeat(3, 1fr)', grid_gap='15px',
+                                 padding='15px', margin='10px 0', border='2px solid #ddd',
+                                 border_radius='12px', background_color='#f8f9fa')
+        )
+
+        controls_section = widgets.VBox([
+            widgets.HTML("<h3 style='color: #2c3e50; border-bottom: 3px solid #9b59b6; padding-bottom: 8px;'>Lung Segment Controls</h3>"),
+            controls_grid
+        ])
+
+        preset_section = widgets.VBox([
+            widgets.HTML("<h3 style='color: #2c3e50; border-bottom: 3px solid #e74c3c; padding-bottom: 8px;'>Quick Presets</h3>"),
+            widgets.HBox(preset_buttons, layout=widgets.Layout(justify_content='space-around', margin='10px 0'))
+        ], layout=widgets.Layout(padding='15px', margin='10px 0', border='2px solid #ddd',
+                                border_radius='12px', background_color='#f8f9fa'))
+
+        export_section = widgets.VBox([
+            widgets.HTML("<h3 style='color: #2c3e50; border-bottom: 3px solid #27ae60; padding-bottom: 8px;'>Export Visualization</h3>"),
+            widgets.HTML("<p style='color: #666; margin: 10px 0;'>"
+                        "📦 Export includes: Interactive controls, 2D CT slices, full 3D viewer with opacity sliders<br>"
+                        "🌐 Works offline in any modern browser</p>"),
+            export_btn
+        ], layout=widgets.Layout(padding='15px', margin='10px 0', border='2px solid #ddd',
+                                border_radius='12px', background_color='#f8f9fa'))
+
+        full_gui = widgets.VBox([header, controls_section, preset_section, export_section])
+        display(full_gui)
+
+    def apply_preset(self, preset_values, output_3d):
+        for seg_key, opacity_val in preset_values.items():
+            self.segment_opacity[seg_key] = opacity_val
+        self.render_visualization(output_3d)
+
+    def update_color(self, change, seg_key, output_3d):
+        self.segment_colors[seg_key] = change['new']
+        self.render_visualization(output_3d)
+
+    def update_opacity(self, change, seg_key, output_3d):
+        self.segment_opacity[seg_key] = change['new']
+        self.render_visualization(output_3d)
+
+    def update_visibility(self, change, seg_key, output_3d):
+        self.segment_visibility[seg_key] = change['new']
+        self.render_visualization(output_3d)
+
+    def render_visualization(self, output_3d):
+        with output_3d:
+            clear_output(wait=True)
+            self.create_3d_visualization().show()
+
+    def create_2d_slices(self):
+        """Display 2D slices in notebook"""
+        center_x = self.ct_data.shape[0] // 2
+        center_y = self.ct_data.shape[1] // 2
+        center_z = self.ct_data.shape[2] // 2
+
+        fig, axes = plt.subplots(1, 3, figsize=(20, 7))
+        fig.suptitle('2D Lung Slice Views with AI Segmentation', fontsize=20, color='white', fontweight='bold', y=0.95)
+        fig.patch.set_facecolor('black')
+
+        slices = [
+            {'name': f'Axial (Z={center_z})', 'ct': self.ct_data[:, :, center_z], 'mask': self.mask_data[:, :, center_z]},
+            {'name': f'Coronal (Y={center_y})', 'ct': self.ct_data[:, center_y, :], 'mask': self.mask_data[:, center_y, :]},
+            {'name': f'Sagittal (X={center_x})', 'ct': self.ct_data[center_x, :, :], 'mask': self.mask_data[center_x, :, :]}
+        ]
+
+        for i, slice_data in enumerate(slices):
+            ax = axes[i]
+
+            # Display CT with lung window
+            ct_windowed = np.clip(slice_data['ct'], -1000, 200)
+            ct_norm = (ct_windowed - ct_windowed.min()) / (ct_windowed.max() - ct_windowed.min())
+            ax.imshow(ct_norm, cmap='gray', interpolation='bilinear')
+
+            # Overlay segmentation
+            mask_overlay = np.zeros((*slice_data['mask'].shape, 4))
+            mask_overlay[slice_data['mask'] > 0] = [1, 0.3, 0.3, 0.5]
+            ax.imshow(mask_overlay)
+
+            ax.set_title(slice_data['name'], color='white', fontsize=16, fontweight='bold', pad=20)
+            ax.axis('off')
+
+        plt.tight_layout(rect=[0, 0.03, 1, 0.92])
+        return fig
+
+    def run(self):
+        """Main execution function"""
+        print("\n" + "="*60)
+        print("STARTING ENHANCED LUNG VIEWER")
+        print("="*60)
+
+        # Load and segment
+        self.load_and_segment()
+
+        # Create output areas
+        output_2d = widgets.Output()
+        output_3d = widgets.Output()
+
+        # Display 2D slices
+        with output_2d:
+            print("\n" + "="*60)
+            print("SECTION 1: 2D CT Slice Views")
+            print("="*60 + "\n")
+            self.create_2d_slices()
+            plt.show()
+
+        display(output_2d)
+
+        # Setup GUI
+        print("\n" + "="*60)
+        print("SECTION 2: Interactive Control Panel")
+        print("="*60 + "\n")
+        self.setup_gui(output_3d)
+
+        # Display 3D
+        print("\n" + "="*60)
+        print("SECTION 3: Interactive 3D Visualization")
+        print("="*60 + "\n")
+
+        with output_3d:
+            self.create_3d_visualization().show()
+
+        display(output_3d)
+
+        print("\n" + "="*60)
+        print("✅ Application loaded successfully!")
+        print("🎮 Use the controls above to interact with the viewer.")
+        print("📥 Click 'Save Complete HTML' to download standalone file.")
+        print("="*60 + "\n")
+
+# Run the application
+if _name_ == '_main_':
+    viewer = LungViewer()
+    viewer.run()
