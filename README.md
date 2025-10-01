@@ -30,6 +30,9 @@ LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738
 
 Lung <img width="1702" height="747" alt="capture_251001_112050" src="https://github.com/user-attachments/assets/6f69e739-e66f-440e-aed9-ad350040567e" />
 
+brain 
+<img width="1883" height="824" alt="capture_251001_113946" src="https://github.com/user-attachments/assets/b1b22850-3d78-48af-af40-6e907dc98d29" />
+<img width="1888" height="1007" alt="capture_251001_114255" src="https://github.com/user-attachments/assets/9d09f725-464a-4177-9fc2-3f0b8e6488bf" />
 
 
 
@@ -38,6 +41,10 @@ Lung <img width="1702" height="747" alt="capture_251001_112050" src="https://git
 liver ![liver 2](https://github.com/user-attachments/assets/f4ace21f-1a6b-47e3-b37f-d73e5054c9ed)
 
 lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-d8ed-4471-afa5-fd92f543e793)
+
+brain <img width="1883" height="824" alt="capture_251001_113946" src="https://github.com/user-attachments/assets/c5c1eb9e-e654-454c-8260-af0c96fbefcf" />
+
+
 
 
 ### Liver
@@ -49,6 +56,10 @@ lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-
 ![Lung 3D](<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
 
 <img width="923" height="559" alt="Screenshot 2025-09-29 162551" src="https://github.com/user-attachments/assets/849ffdd8-6aca-4870-9ed8-ed012ef3cbe4" />)
+
+### brain (brain 3d)
+<img width="1007" height="704" alt="capture_251001_113511" src="https://github.com/user-attachments/assets/708a9377-38c8-415c-9d65-4cd7c55d2a74" />
+
 
 
 ## Installation
