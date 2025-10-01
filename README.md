@@ -35,11 +35,12 @@ brain
 
 ## Screenshots
 
-Liver ![liver 2](https://github.com/user-attachments/assets/f4ace21f-1a6b-47e3-b37f-d73e5054c9ed)
+Liver <img width="1891" height="648" alt="image" src="https://github.com/user-attachments/assets/f0346d50-b246-40bb-b8f3-2f121c1770b3" />
 
-Lungs ![lungs segmentation](https://github.com/user-attachments/assets/ef1786d7-d8ed-4471-afa5-fd92f543e793)
+Lungs  <img width="1672" height="648" alt="image" src="https://github.com/user-attachments/assets/2cb086c2-ad5d-432a-9b52-76489aa159d7" />
 
-Brain <img width="1672" height="648" alt="image" src="https://github.com/user-attachments/assets/3630a80a-4d4e-4ad0-a4fd-ba29bf47875a" />
+Brain <img width="1891" height="648" alt="image" src="https://github.com/user-attachments/assets/3ee6d6c1-8467-4e02-9fed-386b030ca366" />
+
 
 
 ## 3D Visualization 
