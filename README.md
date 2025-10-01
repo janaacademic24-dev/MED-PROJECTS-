@@ -48,16 +48,16 @@ brain <img width="1883" height="824" alt="capture_251001_113946" src="https://gi
 
 
 ### Liver
-![Liver  3D](![liver 1](https://github.com/user-attachments/assets/afb60cd9-bffa-4f96-a5c2-6c65b4e2bf45)
+(![liver 1](https://github.com/user-attachments/assets/afb60cd9-bffa-4f96-a5c2-6c65b4e2bf45)
 )
 )
 
 ### Lungs
-![Lung 3D](<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
+(<img width="964" height="654" alt="Screenshot 2025-09-29 162536" src="https://github.com/user-attachments/assets/a25920b0-f5d7-4765-b0bc-7eee2ae7a2a1" />
 
 <img width="923" height="559" alt="Screenshot 2025-09-29 162551" src="https://github.com/user-attachments/assets/849ffdd8-6aca-4870-9ed8-ed012ef3cbe4" />)
 
-### brain (brain 3d)
+### brain
 <img width="1007" height="704" alt="capture_251001_113511" src="https://github.com/user-attachments/assets/708a9377-38c8-415c-9d65-4cd7c55d2a74" />
 
 
