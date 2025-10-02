@@ -13,8 +13,6 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 6) Dash or Streamlit for web-based apps ( for allowing changing visibility, transparency, colors)
 7) Testing
 8) Writing documentation, including images and videos. 
-## contributes 
-Janamostafa-star
 
 ## Features
 
