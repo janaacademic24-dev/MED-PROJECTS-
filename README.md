@@ -14,7 +14,8 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 7) Testing
 8) Writing documentation, including images and videos. 
 
-
+## contributors 
+@
 ## Features
 
 - 3D visualization using matplotlib/pyvista/plotly/skimage/Nibabel/scipy/Numpy
