@@ -22,7 +22,7 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 - User-friendly script execution
 
 ## collaborators 
-janawaleed135
+janawaleed135 
  Janamostafa-star 
  gannaali061-stack
  
