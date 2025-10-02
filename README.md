@@ -20,7 +20,12 @@ This project visualizes three organs (Liver, Lungs , Brain) in 3D and performs a
 - Automated segmentation using trained deep learning models
 - Organ-specific models
 - User-friendly script execution
-- 
+
+## collaborators 
+janawaleed135
+ Janamostafa-star 
+ gannaali061-stack
+ 
 ## Evaluation metric 
 LIVER ![Ai evaluation ](https://github.com/user-attachments/assets/74082080-e738-46a2-b89b-0bf9238da332)
 
